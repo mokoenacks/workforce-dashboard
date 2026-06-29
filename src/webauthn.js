@@ -41,7 +41,7 @@ router.post('/register/verify', ensureAuthenticated, async (req, res) => {
     const verification = await verifyRegistrationResponse({
       response: req.body,
       expectedChallenge: req.session.webauthnChallenge,
-      expectedOrigin: `http://${rpID}:${process.env.PORT}`,
+      expectedOrigin: `http://${rpID}`,
       expectedRPID: rpID,
     });
     if (verification.verified) {
@@ -88,7 +88,7 @@ router.post('/login/verify', async (req, res) => {
     const verification = await verifyAuthenticationResponse({
       response: req.body,
       expectedChallenge: req.session.webauthnChallenge,
-      expectedOrigin: `http://${rpID}:${process.env.PORT}`,
+      expectedOrigin: `http://${rpID}`,
       expectedRPID: rpID,
       credential: {
         credentialID: Buffer.from(found.CredentialId),
