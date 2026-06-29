@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workforce Dashboard – WorkForce Monitor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    :root {
+      --bg-color: #050a05;
+      --surface-color: #0a120a;
+      --text-color: #00ff41;
+      --text-muted: #80cc80;
+      --accent: #00cc33;
+      --border-color: rgba(0, 255, 0, 0.2);
+      --table-stripe: rgba(0, 255, 0, 0.05);
+    }
+
+    [data-bs-theme="light"] {
+      --bg-color: #0c1a0c;
+      --surface-color: #111f11;
+      --text-color: #aaffaa;
+      --text-muted: #99cc99;
+      --accent: #00dd44;
+      --border-color: rgba(0, 255, 0, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: radial-gradient(circle at 20% 50%, var(--bg-color) 0%, #000 90%);
+      min-height: 100vh;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--text-color);
+      overflow-x: hidden;
+    }
+
+    /* Scan lines overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.02) 2px,
+        rgba(0, 255, 0, 0.02) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Pulsing monitor dot */
+    .monitor-dot {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    .monitor-dot-label {
+      color: var(--text-color);
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      white-space: nowrap;
+      opacity: 0.9;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* Navbar */
+    .navbar {
+      background: rgba(0, 10, 0, 0.85) !important;
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+      padding: 0.5rem 1rem;
+      position: relative;
+      z-index: 1000;
+    }
+    .navbar-brand {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--text-color) !important;
+      font-size: 1.6rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 8px var(--accent);
+    }
+    .btn-outline-light {
+      border-color: var(--accent);
+      color: var(--text-color);
+      transition: all 0.3s;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .btn-outline-light:hover {
+      background: rgba(0, 255, 0, 0.1);
+      color: #fff;
+      border-color: #00ff41;
+      box-shadow: 0 0 10px rgba(0,255,0,0.3);
+    }
+    .btn-outline-danger {
+      border-color: #ff4444;
+      color: #ff4444;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .btn-outline-danger:hover {
+      background: rgba(255, 50, 50, 0.1);
+      border-color: #ff6666;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255,0,0,0.3);
+    }
+
+    /* Tabs */
+    .nav-tabs {
+      border-bottom: 1px solid var(--border-color);
+    }
+    .nav-tabs .nav-link {
+      color: var(--text-muted);
+      border: none;
+      padding: 0.5rem 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .nav-tabs .nav-link.active {
+      background: transparent;
+      color: var(--text-color);
+      border-bottom: 2px solid var(--accent);
+      font-weight: bold;
+      text-shadow: 0 0 5px var(--accent);
+    }
+    .nav-tabs .nav-link:hover {
+      color: #fff;
+      border-color: transparent;
+    }
+
+    /* Cards / Containers */
+    .tab-content {
+      background: rgba(0, 10, 0, 0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
+    }
+
+    /* Labels & inputs */
+    .form-label {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    .form-control, .form-select {
+      background: #020502;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(0,255,0,0.3);
+      background: #020502;
+      color: var(--text-color);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--text-color);
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-primary:hover {
+      background: rgba(0, 255, 0, 0.1);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0,255,0,0.3);
+      border-color: #00ff41;
+    }
+    .btn-success {
+      background: transparent;
+      border: 1px solid var(--accent);
+      color: var(--text-color);
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+    }
+    .btn-success:hover {
+      background: rgba(0, 255, 0, 0.1);
+      box-shadow: 0 0 12px rgba(0,255,0,0.3);
+      border-color: #00ff41;
+    }
+
+    /* Tables */
+    table {
+      color: var(--text-color) !important;
+      border-color: var(--border-color) !important;
+    }
+    thead {
+      background: rgba(0, 20, 0, 0.8);
+    }
+    th {
+      color: var(--accent) !important;
+      font-weight: normal;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border-color) !important;
+    }
+    td {
+      border-color: var(--border-color) !important;
+      background: transparent;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: var(--table-stripe);
+    }
+    .table-bordered {
+      border-color: var(--border-color) !important;
+    }
+
+    /* Active hosts list */
+    #activeHosts li {
+      display: inline-block;
+      margin-right: 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    h3 {
+      color: var(--text-color);
+      text-shadow: 0 0 6px rgba(0,255,0,0.3);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark">
+    <div class="container-fluid">
+      <span class="navbar-brand">WorkForce Monitor</span>
+      <div class="d-flex align-items-center gap-2">
+        <a href="/settings" class="btn btn-outline-light btn-sm">Register Token</a>
+        <button id="themeToggle" class="btn btn-outline-light btn-sm">☀️ Light</button>
+       <button id="signOutBtn" class="btn btn-outline-danger btn-sm">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top: 1.5rem;">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity Logs</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sessions-tab" data-bs-toggle="tab" data-bs-target="#sessions" type="button" role="tab">Sessions</button>
+      </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <!-- Activity Logs Tab -->
+      <div class="tab-pane fade show active" id="activity" role="tabpanel">
+        <h3>Activity Logs</h3>
+        <div class="row mb-2">
+          <div class="col-md-2">
+            <label class="form-label">From Date</label>
+            <input type="date" id="fromDate" class="form-control" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">To Date</label>
+            <input type="date" id="toDate" class="form-control" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Hostname</label>
+            <select id="hostnameFilter" class="form-select">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Application</label>
+            <select id="appFilter" class="form-select">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="filterBtn" class="btn btn-primary w-100">Apply</button>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="exportBtn" class="btn btn-success w-100">Export Excel</button>
+          </div>
+        </div>
+        <table id="logTable" class="table table-striped">
+          <thead><tr><th>Hostname</th><th>App</th><th>Active Time</th><th>Idle Time</th><th>Date</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Sessions Tab -->
+      <div class="tab-pane fade" id="sessions" role="tabpanel">
+        <h3>User Sessions</h3>
+        <div class="row mb-2">
+          <div class="col-md-3">
+            <label class="form-label">Device ID</label>
+            <select id="deviceIdFilter" class="form-select">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button id="sessionFilterBtn" class="btn btn-primary w-100">Apply</button>
+          </div>
+        </div>
+        <table id="sessionsTable" class="table table-sm table-bordered">
+          <thead><tr><th>SessionId</th><th>Hostname</th><th>SignIn</th><th>SignOut</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
