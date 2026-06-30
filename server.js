@@ -7,6 +7,7 @@ const path = require('path');
 const routes = require('./src/routes');
 
 const app = express();
+app.set('trust proxy', 1);
 const port = process.env.PORT || 3000;
 
 // --- Session (required for OAuth & WebAuthn) ---
@@ -14,7 +15,10 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-secret',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false }   // set true if using HTTPS
+ cookie: {
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax'  
+}
 }));
 
 // --- Passport init ---
