@@ -9,6 +9,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
+    /* ============ DARK MODE (unchanged) ============ */
     :root {
       --bg-color: #050a05;
       --surface-color: #0a120a;
@@ -17,28 +18,46 @@
       --accent: #00cc33;
       --border-color: rgba(0, 255, 0, 0.2);
       --table-stripe: rgba(0, 255, 0, 0.05);
+      --input-bg: #020502;
+      --input-focus-bg: #020502;
+      --btn-primary-bg: transparent;
+      --btn-primary-hover-bg: rgba(0, 255, 0, 0.1);
+      --btn-success-bg: transparent;
+      --btn-success-hover-bg: rgba(0, 255, 0, 0.1);
+      --body-bg: radial-gradient(circle at 20% 50%, var(--bg-color) 0%, #000 90%);
+      --scanline-color: rgba(0, 255, 0, 0.02);
     }
 
+    /* ============ LIGHT MODE (true light) ============ */
     [data-bs-theme="light"] {
-      --bg-color: #0c1a0c;
-      --surface-color: #111f11;
-      --text-color: #aaffaa;
-      --text-muted: #99cc99;
-      --accent: #00dd44;
-      --border-color: rgba(0, 255, 0, 0.15);
+      --bg-color: #ffffff;
+      --surface-color: #f8f9fa;
+      --text-color: #1a1a2e;
+      --text-muted: #6c757d;
+      --accent: #0d6efd;
+      --border-color: #dee2e6;
+      --table-stripe: rgba(0, 0, 0, 0.03);
+      --input-bg: #ffffff;
+      --input-focus-bg: #ffffff;
+      --btn-primary-bg: #0d6efd;
+      --btn-primary-hover-bg: #0b5ed7;
+      --btn-success-bg: #198754;
+      --btn-success-hover-bg: #157347;
+      --body-bg: #f0f2f5;
+      --scanline-color: transparent;  /* no scan lines in light mode */
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: radial-gradient(circle at 20% 50%, var(--bg-color) 0%, #000 90%);
+      background: var(--body-bg);
       min-height: 100vh;
       font-family: 'Share Tech Mono', monospace;
       color: var(--text-color);
       overflow-x: hidden;
     }
 
-    /* Scan lines overlay */
+    /* Scan lines overlay (only visible in dark mode) */
     body::before {
       content: "";
       position: fixed;
@@ -47,8 +66,8 @@
         0deg,
         transparent,
         transparent 2px,
-        rgba(0, 255, 0, 0.02) 2px,
-        rgba(0, 255, 0, 0.02) 4px
+        var(--scanline-color) 2px,
+        var(--scanline-color) 4px
       );
       pointer-events: none;
       z-index: 9999;
@@ -76,13 +95,16 @@
 
     /* Navbar */
     .navbar {
-      background: rgba(0, 10, 0, 0.85) !important;
+      background: var(--surface-color) !important;
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
       padding: 0.5rem 1rem;
       position: relative;
       z-index: 1000;
+    }
+    [data-bs-theme="dark"] .navbar {
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
     }
     .navbar-brand {
       font-family: 'Share Tech Mono', monospace;
@@ -98,10 +120,10 @@
       font-family: 'Share Tech Mono', monospace;
     }
     .btn-outline-light:hover {
-      background: rgba(0, 255, 0, 0.1);
+      background: var(--accent);
       color: #fff;
-      border-color: #00ff41;
-      box-shadow: 0 0 10px rgba(0,255,0,0.3);
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
     }
     .btn-outline-danger {
       border-color: #ff4444;
@@ -135,18 +157,21 @@
       text-shadow: 0 0 5px var(--accent);
     }
     .nav-tabs .nav-link:hover {
-      color: #fff;
+      color: var(--text-color);
       border-color: transparent;
     }
 
     /* Cards / Containers */
     .tab-content {
-      background: rgba(0, 10, 0, 0.7);
+      background: var(--surface-color);
       backdrop-filter: blur(4px);
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 1.5rem;
       margin-top: 1rem;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    }
+    [data-bs-theme="dark"] .tab-content {
       box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
     }
 
@@ -157,21 +182,21 @@
       letter-spacing: 1px;
     }
     .form-control, .form-select {
-      background: #020502;
+      background: var(--input-bg);
       border: 1px solid var(--border-color);
       color: var(--text-color);
       font-family: 'Share Tech Mono', monospace;
     }
     .form-control:focus, .form-select:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 8px rgba(0,255,0,0.3);
-      background: #020502;
+      box-shadow: 0 0 8px var(--accent);
+      background: var(--input-focus-bg);
       color: var(--text-color);
     }
 
     /* Buttons */
     .btn-primary {
-      background: transparent;
+      background: var(--btn-primary-bg);
       border: 1px solid var(--accent);
       color: var(--text-color);
       font-family: 'Share Tech Mono', monospace;
@@ -179,22 +204,22 @@
       letter-spacing: 1px;
     }
     .btn-primary:hover {
-      background: rgba(0, 255, 0, 0.1);
+      background: var(--btn-primary-hover-bg);
       color: #fff;
-      box-shadow: 0 0 12px rgba(0,255,0,0.3);
-      border-color: #00ff41;
+      box-shadow: 0 0 12px var(--accent);
+      border-color: var(--accent);
     }
     .btn-success {
-      background: transparent;
+      background: var(--btn-success-bg);
       border: 1px solid var(--accent);
-      color: var(--text-color);
+      color: #fff;
       font-family: 'Share Tech Mono', monospace;
       text-transform: uppercase;
     }
     .btn-success:hover {
-      background: rgba(0, 255, 0, 0.1);
-      box-shadow: 0 0 12px rgba(0,255,0,0.3);
-      border-color: #00ff41;
+      background: var(--btn-success-hover-bg);
+      box-shadow: 0 0 12px var(--accent);
+      border-color: var(--accent);
     }
 
     /* Tables */
@@ -203,7 +228,7 @@
       border-color: var(--border-color) !important;
     }
     thead {
-      background: rgba(0, 20, 0, 0.8);
+      background: var(--surface-color);
     }
     th {
       color: var(--accent) !important;
@@ -233,7 +258,7 @@
 
     h3 {
       color: var(--text-color);
-      text-shadow: 0 0 6px rgba(0,255,0,0.3);
+      text-shadow: 0 0 6px var(--accent);
       letter-spacing: 2px;
       text-transform: uppercase;
     }
@@ -246,7 +271,7 @@
       <div class="d-flex align-items-center gap-2">
         <a href="/settings" class="btn btn-outline-light btn-sm">Register Token</a>
         <button id="themeToggle" class="btn btn-outline-light btn-sm">☀️ Light</button>
-       <button id="signOutBtn" class="btn btn-outline-danger btn-sm">Sign Out</button>
+        <button id="signOutBtn" class="btn btn-outline-danger btn-sm">Sign Out</button>
       </div>
     </div>
   </nav>

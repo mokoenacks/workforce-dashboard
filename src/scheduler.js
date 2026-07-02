@@ -12,7 +12,7 @@ const SHEET_PASSWORD = 'workforce-readonly';
  */
 async function generateMonthlyReport(testMode = false) {
   // Daily lock – skip if already sent today (only when NOT in test mode)
-  if (!testMode && !canSendToday()) {
+  if (!canSendToday()) {
     console.log('Report already sent today – skipping.');
     return;
   }
