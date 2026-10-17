@@ -1,3 +1,4 @@
 node_modules/
 .env
 last_report_sent.txt
+password.json
